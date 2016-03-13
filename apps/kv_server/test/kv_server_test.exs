@@ -1,6 +1,7 @@
 defmodule KVServerTest do
   use ExUnit.Case
   doctest KVServer
+  @moduletag :capture_log
 
   setup do
     Application.stop(:kv)
