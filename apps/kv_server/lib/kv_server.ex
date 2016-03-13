@@ -1,8 +1,8 @@
 defmodule KVServer do
   use Application
-
   require Logger
 
+  @doc false
   def start(_type, _args) do
     import Supervisor.Spec
 
@@ -11,12 +11,13 @@ defmodule KVServer do
       worker(Task, [KVServer, :accept, [4040]])
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: KVServer.Supervisor]
     Supervisor.start_link(children, opts)
   end
 
+  @doc """
+  Starts accepting connections on the given `port`
+  """
   def accept(port) do
     # The options below mean:
     #
@@ -24,9 +25,12 @@ defmodule KVServer do
     # 2. `packet: :line` - receives data line by line
     # 3. `active: false` - blocks on `:gen_tcp.recv/2` until data is available
     # 4. `reuseaddr: true` - allows us to reuse the address if the listener crashes
-    #
+
     {:ok, socket} = :gen_tcp.listen(port,
-                      [:binary, packet: :line, active: false, reuseaddr: true])
+                      [:binary,
+                       packet: :line,
+                       active: false,
+                       reuseaddr: true])
     Logger.info "Accepting connections on port #{port}"
     loop_acceptor(socket)
   end
